@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grand Luxe - Guest Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Guest Portal Specific Styles */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(9, 9, 14, .95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 36px;
+      height: 65px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .topbar-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      color: var(--gold);
+    }
+
+    .topbar-nav {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tnav {
+      padding: 8px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      color: var(--text-sub);
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .tnav:hover {
+      background: var(--surface2);
+      color: var(--text);
+    }
+
+    .tnav.active {
+      background: rgba(201, 168, 76, .12);
+      color: var(--gold);
+    }
+
+    .topbar-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      padding: 6px 14px;
+      border-radius: 12px;
+      transition: background .2s;
+    }
+
+    .topbar-user:hover {
+      background: var(--surface2);
+    }
+
+    .tav {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--bg);
+    }
+
+    .app-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px 36px;
+    }
+
+    .subpage {
+      display: none;
+    }
+
+    .subpage.active {
+      display: block;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+    }
+
+    .card-head {
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 16px;
+    }
+
+    .card-body {
+      padding: 20px;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 8px 18px;
+      border-radius: var(--rs);
+      border: none;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all .2s;
+    }
+
+    .btn-g {
+      background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+      color: var(--bg);
+      font-weight: 700;
+    }
+
+    .btn-g:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(201, 168, 76, .3);
+    }
+
+    .btn-o {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-sub);
+    }
+
+    .btn-o:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .btn-r {
+      background: transparent;
+      border: 1px solid rgba(224, 90, 90, .3);
+      color: var(--red);
+    }
+
+    .btn-r:hover {
+      background: rgba(224, 90, 90, .08);
+    }
+
+    /* Forms */
+    .fgrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .fg {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .fg label {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .fg input, .fg textarea {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--rs);
+      padding: 10px 14px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+    }
+
+    .fg input:focus, .fg textarea:focus {
+      border-color: var(--gold);
+    }
+
+    /* Rooms Grid */
+    .rooms-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 22px;
+    }
+
+    .room-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      transition: all .25s;
+    }
+
+    .room-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-3px);
+    }
+
+    .room-img {
+      height: 140px;
+      background: linear-gradient(135deg, var(--surface2), var(--surface3));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      position: relative;
+    }
+
+    .room-status {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(9, 9, 14, .9);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+    }
+
+    .room-status.available {
+      color: var(--green);
+      border: 1px solid rgba(76, 175, 125, .3);
+    }
+
+    .room-status.unavailable {
+      color: var(--red);
+      border: 1px solid rgba(224, 90, 90, .3);
+    }
+
+    .room-info {
+      padding: 16px;
+    }
+
+    .room-type {
+      font-size: 10px;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .room-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      margin: 6px 0;
+    }
+
+    .room-desc {
+      font-size: 12px;
+      color: var(--text-sub);
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .room-features {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .feature {
+      background: var(--surface2);
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      color: var(--text-sub);
+    }
+
+    .room-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .room-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      color: var(--gold);
+    }
+
+    .room-price small {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* Booking Layout */
+    .booking-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+    }
+
+    .booking-summary {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 24px;
+      position: sticky;
+      top: 20px;
+    }
+
+    .summary-img {
+      height: 100px;
+      background: linear-gradient(135deg, var(--surface2), var(--surface3));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      margin-bottom: 16px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(201, 168, 76, .08);
+    }
+
+    .summary-total {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0 0;
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--gold);
+    }
+
+    /* Profile Layout */
+    .profile-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 24px;
+    }
+
+    .profile-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 28px;
+      text-align: center;
+    }
+
+    .profile-avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--bg);
+      margin: 0 auto 16px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+    }
+
+    .b-green { background: rgba(76, 175, 125, .15); color: var(--green); }
+    .b-gold { background: rgba(201, 168, 76, .15); color: var(--gold); }
+    .b-red { background: rgba(224, 90, 90, .15); color: var(--red); }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      text-align: left;
+      font-size: 13px;
+      border-bottom: 1px solid rgba(201, 168, 76, .06);
+    }
+
+    th {
+      color: var(--text-muted);
+      font-weight: 500;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .section-header {
+      margin-bottom: 24px;
+    }
+
+    .section-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+    }
+
+    .section-header p {
+      color: var(--text-sub);
+      font-size: 13px;
+    }
+
+    .filter-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 18px 22px;
+      margin-bottom: 24px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .filter-group label {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .filter-group input, .filter-group select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--rs);
+      padding: 9px 13px;
+      color: var(--text);
+      font-size: 13px;
+      width: 140px;
+    }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient"></div>
+  <div class="grid-overlay"></div>
+
+  <div id="guest-app" style="height:100vh; display:flex; flex-direction:column;">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-logo">⬡ Grand Luxe</div>
+      <div class="topbar-nav">
+        <div class="tnav active" data-page="rooms">🛏 Rooms</div>
+        <div class="tnav" data-page="bookings">📋 My Bookings</div>
+        <div class="tnav" data-page="profile">👤 Profile</div>
+      </div>
+      <div class="topbar-user" id="user-menu">
+        <div class="tav" id="user-avatar">G</div>
+        <span id="user-name">Guest</span>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="app-body">
+      <!-- Rooms Page -->
+      <div class="subpage active" id="page-rooms">
+        <div class="section-header">
+          <h1>Available Rooms</h1>
+          <p>Choose your perfect stay — prices per night</p>
+        </div>
+        <div class="filter-bar">
+          <div class="filter-group">
+            <label>Check-in</label>
+            <input type="date" id="filter-checkin">
+          </div>
+          <div class="filter-group">
+            <label>Check-out</label>
+            <input type="date" id="filter-checkout">
+          </div>
+          <div class="filter-group">
+            <label>Room Type</label>
+            <select id="filter-type">
+              <option value="">All Types</option>
+              <option>Standard</option>
+              <option>Deluxe</option>
+              <option>Suite</option>
+              <option>Penthouse</option>
+            </select>
+          </div>
+          <button class="btn btn-g" id="search-rooms">Search</button>
+        </div>
+        <div class="rooms-grid" id="rooms-container"></div>
+      </div>
+
+      <!-- Booking Page -->
+      <div class="subpage" id="page-booking">
+        <div style="margin-bottom: 20px;">
+          <button class="btn btn-o" id="back-to-rooms">← Back to Rooms</button>
+        </div>
+        <div class="booking-layout">
+          <div class="booking-form">
+            <h2 style="font-family:'Playfair Display'; margin-bottom:20px;">Complete Your Booking</h2>
+            <div class="fgrid">
+              <div class="fg"><label>First Name</label><input type="text" id="book-firstname"></div>
+              <div class="fg"><label>Last Name</label><input type="text" id="book-lastname"></div>
+              <div class="fg"><label>Email</label><input type="email" id="book-email"></div>
+              <div class="fg"><label>Phone</label><input type="tel" id="book-phone" placeholder="+20 100 000 0000"></div>
+            </div>
+            <div class="divider"></div>
+            <div class="fgrid">
+              <div class="fg"><label>Check-in</label><input type="date" id="book-checkin"></div>
+              <div class="fg"><label>Check-out</label><input type="date" id="book-checkout"></div>
+              <div class="fg ffull"><label>Special Requests</label><textarea rows="3" id="book-requests" placeholder="Any special requests?"></textarea></div>
+            </div>
+            <button class="btn btn-g" id="confirm-booking" style="width:100%; margin-top:20px; padding:12px;">✓ Confirm Booking</button>
+          </div>
+          <div class="booking-summary">
+            <div class="summary-img"><span id="summary-emoji">🏨</span></div>
+            <div style="font-size:11px; color:var(--gold);" id="summary-type">Room Type</div>
+            <div style="font-size:16px; font-family:'Playfair Display'; margin-bottom:12px;" id="summary-name">Room Name</div>
+            <div class="summary-row"><span>Per Night</span><span id="summary-price">$0</span></div>
+            <div class="summary-row"><span>Nights</span><span id="summary-nights">—</span></div>
+            <div class="summary-row"><span>Subtotal</span><span id="summary-subtotal">$0</span></div>
+            <div class="summary-row"><span>Tax (14%)</span><span id="summary-tax">$0</span></div>
+            <div class="summary-total"><span>Total</span><span id="summary-total">$0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- My Bookings Page -->
+      <div class="subpage" id="page-bookings">
+        <div class="section-header">
+          <h1>My Bookings</h1>
+          <p>Track and manage your reservations</p>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">Reservation History</div></div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Reference</th><th>Room</th><th>Check-in</th><th>Check-out</th><th>Total</th><th>Status</th><th>Action</th></tr>
+              </thead>
+              <tbody id="bookings-list"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Page -->
+      <div class="subpage" id="page-profile">
+        <div class="profile-layout">
+          <div class="profile-card">
+            <div class="profile-avatar" id="profile-avatar">G</div>
+            <h3 id="profile-name">Guest</h3>
+            <p style="color:var(--text-sub); font-size:12px;" id="profile-email">—</p>
+            <div class="badge b-gold" id="profile-badge" style="margin-top:12px;">🪙 New Member</div>
+            <div style="margin-top:20px; width:100%;">
+              <div style="display:flex; justify-content:space-between; padding:8px 0;"><span>Role</span><span id="profile-role">Guest</span></div>
+              <div style="display:flex; justify-content:space-between; padding:8px 0;"><span>Bookings</span><span id="profile-bookings">0</span></div>
+            </div>
+            <button class="btn btn-r" id="logout-btn" style="margin-top:20px; width:100%;">Sign Out</button>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">Personal Information</div></div>
+            <div class="card-body">
+              <div class="fgrid">
+                <div class="fg"><label>First Name</label><input type="text" id="profile-fn"></div>
+                <div class="fg"><label>Last Name</label><input type="text" id="profile-ln"></div>
+                <div class="fg ffull"><label>Email</label><input type="email" id="profile-em"></div>
+              </div>
+              <button class="btn btn-g" id="save-profile" style="margin-top:16px;">Save Changes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script src="script.js"></script>
+  <script>
+    // Guest Portal Logic
+    let currentUser = null;
+    let selectedRoom = null;
+
+    // Load user from localStorage
+    function loadUser() {
+      currentUser = window.getCurrentUser();
+      if (!currentUser || (currentUser.role !== 'guest' && currentUser.role !== 'frontdesk')) {
+        window.location.href = 'index.html';
+        return false;
+      }
+      updateUserUI();
+      return true;
+    }
+
+    function updateUserUI() {
+      const initial = (currentUser.firstName[0] + (currentUser.lastName[0] || '')).toUpperCase();
+      document.getElementById('user-avatar').textContent = initial;
+      document.getElementById('user-name').textContent = currentUser.firstName;
+      document.getElementById('profile-avatar').textContent = initial;
+      document.getElementById('profile-name').textContent = currentUser.firstName + ' ' + currentUser.lastName;
+      document.getElementById('profile-email').textContent = currentUser.email;
+      document.getElementById('profile-fn').value = currentUser.firstName;
+      document.getElementById('profile-ln').value = currentUser.lastName;
+      document.getElementById('profile-em').value = currentUser.email;
+      document.getElementById('book-firstname').value = currentUser.firstName;
+      document.getElementById('book-lastname').value = currentUser.lastName;
+      document.getElementById('book-email').value = currentUser.email;
+    }
+
+    // Page Navigation
+    function switchPage(pageId) {
+      document.querySelectorAll('.subpage').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + pageId).classList.add('active');
+      document.querySelectorAll('.tnav').forEach(t => t.classList.remove('active'));
+      document.querySelector(`.tnav[data-page="${pageId}"]`).classList.add('active');
+      if (pageId === 'bookings') loadUserBookings();
+    }
+
+    document.querySelectorAll('.tnav').forEach(btn => {
+      btn.addEventListener('click', () => switchPage(btn.getAttribute('data-page')));
+    });
+    document.getElementById('back-to-rooms')?.addEventListener('click', () => switchPage('rooms'));
+
+    // Render Rooms
+    function renderRooms() {
+      const type = document.getElementById('filter-type').value;
+      let rooms = window.ROOMS_DATA;
+      if (type) rooms = rooms.filter(r => r.type === type);
+      const container = document.getElementById('rooms-container');
+      container.innerHTML = rooms.map(room => `
+        <div class="room-card">
+          <div class="room-img">
+            <span>${room.emoji}</span>
+            <div class="room-status ${room.available ? 'available' : 'unavailable'}">
+              ${room.available ? '✓ Available' : '✗ Unavailable'}
+            </div>
+          </div>
+          <div class="room-info">
+            <div class="room-type">${room.type}</div>
+            <div class="room-name">${room.name}</div>
+            <div class="room-desc">${room.desc}</div>
+            <div class="room-features">${room.features.map(f => `<span class="feature">${f}</span>`).join('')}</div>
+            <div class="room-footer">
+              <div class="room-price">$${room.price}<small>/night</small></div>
+              <button class="btn ${room.available ? 'btn-g' : 'btn-o'}" onclick="bookRoom(${room.id})" ${!room.available ? 'disabled' : ''}>
+                ${room.available ? 'Book Now' : 'Unavailable'}
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.bookRoom = function(roomId) {
+      selectedRoom = window.ROOMS_DATA.find(r => r.id === roomId);
+      if (!selectedRoom || !selectedRoom.available) return;
+      
+      document.getElementById('summary-emoji').textContent = selectedRoom.emoji;
+      document.getElementById('summary-type').textContent = selectedRoom.type;
+      document.getElementById('summary-name').textContent = selectedRoom.name;
+      document.getElementById('summary-price').textContent = '$' + selectedRoom.price;
+      
+      const checkin = document.getElementById('filter-checkin').value || window.getDaysFromNow(1);
+      const checkout = document.getElementById('filter-checkout').value || window.getDaysFromNow(3);
+      document.getElementById('book-checkin').value = checkin;
+      document.getElementById('book-checkout').value = checkout;
+      
+      calculateTotal();
+      switchPage('booking');
+    };
+
+    function calculateTotal() {
+      if (!selectedRoom) return;
+      const checkin = document.getElementById('book-checkin').value;
+      const checkout = document.getElementById('book-checkout').value;
+      if (!checkin || !checkout) return;
+      
+      const nights = Math.max(1, Math.round((new Date(checkout) - new Date(checkin)) / 86400000));
+      const subtotal = selectedRoom.price * nights;
+      const tax = Math.round(subtotal * 0.14);
+      const total = subtotal + tax;
+      
+      document.getElementById('summary-nights').textContent = nights;
+      document.getElementById('summary-subtotal').textContent = '$' + subtotal;
+      document.getElementById('summary-tax').textContent = '$' + tax;
+      document.getElementById('summary-total').textContent = '$' + total;
+    }
+
+    document.getElementById('book-checkin')?.addEventListener('change', calculateTotal);
+    document.getElementById('book-checkout')?.addEventListener('change', calculateTotal);
+
+    // Confirm Booking
+    document.getElementById('confirm-booking')?.addEventListener('click', () => {
+      const checkin = document.getElementById('book-checkin').value;
+      const checkout = document.getElementById('book-checkout').value;
+      const firstName = document.getElementById('book-firstname').value.trim();
+      const lastName = document.getElementById('book-lastname').value.trim();
+      const email = document.getElementById('book-email').value.trim();
+      
+      if (!checkin || !checkout || !firstName || !email) {
+        window.showToast('Please fill all required fields', 'error');
+        return;
+      }
+      
+      const nights = Math.max(1, Math.round((new Date(checkout) - new Date(checkin)) / 86400000));
+      const total = Math.round(selectedRoom.price * nights * 1.14);
+      const ref = '#R-' + Math.floor(1000 + Math.random() * 9000);
+      
+      const booking = {
+        id: 'b' + Date.now(),
+        ref: ref,
+        userId: currentUser.id,
+        guestName: firstName + ' ' + lastName,
+        guestEmail: email,
+        room: selectedRoom,
+        checkIn: checkin,
+        checkOut: checkout,
+        nights: nights,
+        total: total,
+        requests: document.getElementById('book-requests').value,
+        status: 'pending',
+        createdAt: new Date().toISOString()
+      };
+      
+      window.DB.bookings.push(booking);
+      window.saveToLocalStorage();
+      window.showToast('Booking submitted! Waiting for approval.', 'success');
+      loadUserBookings();
+      switchPage('bookings');
+    });
+
+    function loadUserBookings() {
+      const myBookings = window.DB.bookings.filter(b => b.userId === currentUser.id);
+      document.getElementById('profile-bookings').textContent = myBookings.length;
+      const tbody = document.getElementById('bookings-list');
+      
+      if (myBookings.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px;">No bookings yet. Browse rooms to get started!</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = myBookings.map(b => `
+        <tr>
+          <td style="color:var(--gold);">${b.ref}</td>
+          <td><span class="badge b-gold">${b.room.name}</span></td>
+          <td>${window.formatDate(b.checkIn)}</td>
+          <td>${window.formatDate(b.checkOut)}</td>
+          <td>$${b.total}</td>
+          <td>${window.statusBadge(b.status)}</td>
+          <td>${b.status === 'pending' ? `<button class="btn btn-r" style="padding:4px 12px;" onclick="cancelBooking('${b.id}')">Cancel</button>` : '—'}</td>
+        </tr>
+      `).join('');
+    }
+
+    window.cancelBooking = function(bookingId) {
+      const booking = window.DB.bookings.find(b => b.id === bookingId);
+      if (booking) {
+        booking.status = 'cancelled';
+        window.saveToLocalStorage();
+        loadUserBookings();
+        window.showToast('Booking cancelled', 'info');
+      }
+    };
+
+    // Save Profile
+    document.getElementById('save-profile')?.addEventListener('click', () => {
+      const fn = document.getElementById('profile-fn').value.trim();
+      const ln = document.getElementById('profile-ln').value.trim();
+      if (!fn) {
+        window.showToast('First name required', 'error');
+        return;
+      }
+      currentUser.firstName = fn;
+      currentUser.lastName = ln;
+      window.setCurrentUser(currentUser);
+      updateUserUI();
+      window.saveToLocalStorage();
+      window.showToast('Profile updated!', 'success');
+    });
+
+    // Logout
+    document.getElementById('logout-btn')?.addEventListener('click', () => {
+      window.logout();
+    });
+
+    // Search Rooms
+    document.getElementById('search-rooms')?.addEventListener('click', renderRooms);
+    
+    // Set default dates
+    document.getElementById('filter-checkin').value = window.getDaysFromNow(1);
+    document.getElementById('filter-checkout').value = window.getDaysFromNow(3);
+
+    // Initialize
+    if (loadUser()) {
+      renderRooms();
+      loadUserBookings();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grand Luxe - Housekeeper</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .b-orange {
+      background-color: rgba(251, 146, 60, 0.15);
+      color: #fb923c;
+      border: 1px solid rgba(251, 146, 60, 0.3);
+    }
+    .b-blue {
+      background-color: rgba(96, 165, 250, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(96, 165, 250, 0.3);
+    }
+    .b-purple {
+      background-color: rgba(167, 139, 250, 0.15);
+      color: #a78bfa;
+      border: 1px solid rgba(167, 139, 250, 0.3);
+    }
+    .btn-repair {
+      background: transparent;
+      border: 1px solid rgba(251, 146, 60, 0.5);
+      color: #fb923c;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+    }
+    .btn-repair:hover { background: rgba(251, 146, 60, 0.1); }
+    .btn-start-repair {
+      background: transparent;
+      border: 1px solid rgba(96, 165, 250, 0.5);
+      color: #60a5fa;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+    }
+    .btn-start-repair:hover { background: rgba(96, 165, 250, 0.1); }
+    .btn-mark-repaired {
+      background: transparent;
+      border: 1px solid rgba(167, 139, 250, 0.5);
+      color: #a78bfa;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+    }
+    .btn-mark-repaired:hover { background: rgba(167, 139, 250, 0.1); }
+    .status-cell {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .action-cell {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo">⬡ Grand Luxe</div>
+  <div class="topbar-user">Housekeeper</div>
+</div>
+
+<div class="app-body">
+
+  <div class="section-header">
+    <h1>Housekeeping</h1>
+    <p>Manage room cleaning status</p>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">Rooms Status</div>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Room</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Last Updated</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr data-clean="needs-cleaning" data-repair="none">
+            <td>101</td>
+            <td>Standard</td>
+            <td>
+              <div class="status-cell">
+                <span class="badge b-red clean-badge">Needs Cleaning</span>
+              </div>
+            </td>
+            <td class="time-cell">10:30 AM</td>
+            <td>
+              <div class="action-cell">
+                <button class="btn btn-g" onclick="startCleaning(this)">Start</button>
+                <button class="btn-repair" onclick="reportRepair(this)">Report Repair</button>
+              </div>
+            </td>
+          </tr>
+
+          <tr data-clean="cleaning" data-repair="none">
+            <td>205</td>
+            <td>Deluxe</td>
+            <td>
+              <div class="status-cell">
+                <span class="badge b-gold clean-badge">Cleaning</span>
+              </div>
+            </td>
+            <td class="time-cell">11:00 AM</td>
+            <td>
+              <div class="action-cell">
+                <button class="btn btn-g" onclick="markReady(this)">Mark Ready</button>
+                <button class="btn-repair" onclick="reportRepair(this)">Report Repair</button>
+              </div>
+            </td>
+          </tr>
+
+          <tr data-clean="ready" data-repair="none">
+            <td>310</td>
+            <td>Suite</td>
+            <td>
+              <div class="status-cell">
+                <span class="badge b-green clean-badge">Ready</span>
+              </div>
+            </td>
+            <td class="time-cell">09:45 AM</td>
+            <td>
+              <div class="action-cell">
+                <button class="btn-repair" onclick="reportRepair(this)">Report Repair</button>
+              </div>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function getNow() {
+    return new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // ====== Clean Actions ======
+  function startCleaning(btn) {
+    const row = btn.closest('tr');
+    row.dataset.clean = 'cleaning';
+    row.querySelector('.clean-badge').className = 'badge b-gold clean-badge';
+    row.querySelector('.clean-badge').textContent = 'Cleaning';
+    row.querySelector('.time-cell').textContent = getNow();
+    updateActions(row);
+  }
+
+  function markReady(btn) {
+    const row = btn.closest('tr');
+    row.dataset.clean = 'ready';
+    row.querySelector('.clean-badge').className = 'badge b-green clean-badge';
+    row.querySelector('.clean-badge').textContent = 'Ready';
+    row.querySelector('.time-cell').textContent = getNow();
+    updateActions(row);
+  }
+
+  // ====== Repair Actions ======
+  function reportRepair(btn) {
+    const row = btn.closest('tr');
+    row.dataset.repair = 'needs-repair';
+    setRepairBadge(row, 'b-orange', 'Needs Repair');
+    row.querySelector('.time-cell').textContent = getNow();
+    updateActions(row);
+  }
+
+  function startRepair(btn) {
+    const row = btn.closest('tr');
+    row.dataset.repair = 'repairing';
+    setRepairBadge(row, 'b-blue', 'Repairing');
+    row.querySelector('.time-cell').textContent = getNow();
+    updateActions(row);
+  }
+
+  function markRepaired(btn) {
+    const row = btn.closest('tr');
+    row.dataset.repair = 'repaired';
+    setRepairBadge(row, 'b-purple', 'Repaired');
+    row.querySelector('.time-cell').textContent = getNow();
+    updateActions(row);
+  }
+
+  // ====== Helpers ======
+  function setRepairBadge(row, colorClass, text) {
+    let badge = row.querySelector('.repair-badge');
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.className = 'badge repair-badge';
+      row.querySelector('.status-cell').appendChild(badge);
+    }
+    badge.className = `badge repair-badge ${colorClass}`;
+    badge.textContent = text;
+  }
+
+  function updateActions(row) {
+    const clean = row.dataset.clean;
+    const repair = row.dataset.repair;
+    const actionCell = row.querySelector('.action-cell');
+    let html = '';
+
+    // Clean buttons
+    if (clean === 'needs-cleaning') {
+      html += `<button class="btn btn-g" onclick="startCleaning(this)">Start</button>`;
+    } else if (clean === 'cleaning') {
+      html += `<button class="btn btn-g" onclick="markReady(this)">Mark Ready</button>`;
+    }
+
+    // Repair buttons
+    if (repair === 'none') {
+      html += `<button class="btn-repair" onclick="reportRepair(this)">Report Repair</button>`;
+    } else if (repair === 'needs-repair') {
+      html += `<button class="btn-start-repair" onclick="startRepair(this)">Start Repair</button>`;
+    } else if (repair === 'repairing') {
+      html += `<button class="btn-mark-repaired" onclick="markRepaired(this)">Mark Repaired</button>`;
+    }
+    // repaired → no button
+
+    if (!html) html = '—';
+    actionCell.innerHTML = html;
+  }
+</script>
+
+</body>
+</html>

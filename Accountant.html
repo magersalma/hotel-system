@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Invoice System</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="topbar">
+  <div class="logo">⬡ Grand Luxe</div>
+  <div>Accountant</div>
+</div>
+
+<div class="app-body">
+
+  <!-- ADD SERVICE -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">Add Service</div>
+    </div>
+
+    <div class="card-body">
+
+      <div class="form-grid">
+
+        <div class="fg">
+          <label>Service</label>
+          <select id="service">
+            <option>Cafe</option>
+            <option>Spa</option>
+            <option>Minibar</option>
+            <option>Laundry</option>
+          </select>
+        </div>
+
+        <div class="fg">
+          <label>Item</label>
+          <input id="item" type="text">
+        </div>
+
+        <div class="fg">
+          <label>Qty</label>
+          <input id="qty" type="number">
+        </div>
+
+        <div class="fg">
+          <label>Unit Price</label>
+          <input id="price" type="number">
+        </div>
+
+      </div>
+
+      <button class="btn" onclick="addToInvoice()">Add to Invoice</button>
+
+    </div>
+  </div>
+
+  <br>
+
+  <!-- INVOICE -->
+  <div class="card">
+
+    <div class="card-head">
+      <div class="card-title">Live Invoice</div>
+    </div>
+
+    <div class="card-body">
+
+      <table width="100%">
+        <thead>
+          <tr>
+            <th>Service</th>
+            <th>Item</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+
+        <tbody id="invoiceBody"></tbody>
+      </table>
+
+      <div style="margin-top:15px; font-size:20px;">
+        Total:
+        <span id="total">0</span> EGP
+      </div>
+
+      <button class="btn" style="margin-top:15px; background: #4CAF7D; color:#fff;">
+        Checkout Invoice
+      </button>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+let total = 0;
+
+function addToInvoice() {
+
+  const service = document.getElementById("service").value;
+  const item = document.getElementById("item").value;
+  const qty = Number(document.getElementById("qty").value);
+  const price = Number(document.getElementById("price").value);
+
+  if (!item || qty <= 0 || price <= 0) return;
+
+  const rowTotal = qty * price;
+  total += rowTotal;
+
+  document.getElementById("invoiceBody").innerHTML += `
+    <tr>
+      <td>${service}</td>
+      <td>${item}</td>
+      <td>${qty}</td>
+      <td>${price}</td>
+      <td>${rowTotal}</td>
+    </tr>
+  `;
+
+  document.getElementById("total").innerText = total;
+
+  // clear inputs
+  document.getElementById("item").value = "";
+  document.getElementById("qty").value = "";
+  document.getElementById("price").value = "";
+}
+</script>
+
+</body>
+</html>

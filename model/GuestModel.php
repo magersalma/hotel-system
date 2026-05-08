@@ -36,7 +36,7 @@ class GuestModel {
             return false;  
         }
     }
-
+    //function 3:booking
     public function getGuestBookings($guestID) {
     $sql = "SELECT r.*, rm.type, rm.price 
             FROM reservation r 
@@ -55,6 +55,7 @@ class GuestModel {
     }
     return $bookings;
 }
+    //function 4:feedback
 public function addFeedback($resID, $rating, $comment) {
     $sql = "INSERT INTO feedback (res_id, rating, comment) VALUES (?, ?, ?)";
     $stmt = $this->db->prepare($sql);

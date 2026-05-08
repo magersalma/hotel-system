@@ -2,17 +2,13 @@
 require_once '../controller/GuestController.php';
 $controller = new GuestController();
 
-// --- Handle Profile Update ---
 if (isset($_POST['save_profile'])) {
-    // Get data from the submitted form
     $fname = $_POST['fname'];
     $lname = $_POST['lname'];
     $email = $_POST['email'];
     
-    // Call the controller to update the data (1 is the default guest ID for demo)
     $controller->updateProfile(1, $fname, $lname, $email); 
     
-    // Show success toast notification
 echo "<script>
     document.addEventListener('DOMContentLoaded', function() {
         showToast('Profile updated successfully! ✨');
@@ -20,7 +16,6 @@ echo "<script>
 </script>";
 }
 
-// Refresh data to update the UI with new changes
 $guestData = $controller->showProfile(1); 
 
 $bookings = $controller->showBookings(1);

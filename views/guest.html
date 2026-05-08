@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grand Luxe - Guest Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../public/style.css"> <!-- ✅ تم التعديل -->
+</head>
+<body>
+  <div class="ambient"></div>
+  <div class="grid-overlay"></div>
+
+  <div id="guest-app" style="height:100vh; display:flex; flex-direction:column;">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-logo">⬡ Grand Luxe</div>
+      <div class="topbar-nav">
+        <div class="tnav active" data-page="rooms">🛏 Rooms</div>
+        <div class="tnav" data-page="bookings">📋 My Bookings</div>
+        <div class="tnav" data-page="profile">👤 Profile</div>
+      </div>
+      <div class="topbar-user" id="user-menu">
+        <div class="tav" id="user-avatar">G</div>
+        <span id="user-name">Guest</span>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="app-body">
+
+      <!-- Rooms Page -->
+      <div class="subpage active" id="page-rooms">
+        <div class="section-header">
+          <h1>Available Rooms</h1>
+          <p>Choose your perfect stay — prices per night</p>
+        </div>
+        <div class="filter-bar">
+          <div class="filter-group">
+            <label>Check-in</label>
+            <input type="date" id="filter-checkin">
+          </div>
+          <div class="filter-group">
+            <label>Check-out</label>
+            <input type="date" id="filter-checkout">
+          </div>
+          <div class="filter-group">
+            <label>Room Type</label>
+            <select id="filter-type">
+              <option value="">All Types</option>
+              <option>Standard</option>
+              <option>Deluxe</option>
+              <option>Suite</option>
+              <option>Penthouse</option>
+            </select>
+          </div>
+          <button class="btn btn-g" id="search-rooms">Search</button>
+        </div>
+        <div class="rooms-grid" id="rooms-container"></div>
+      </div>
+
+      <!-- Booking Page -->
+      <div class="subpage" id="page-booking">
+        <div style="margin-bottom: 20px;">
+          <button class="btn btn-o" id="back-to-rooms">← Back to Rooms</button>
+        </div>
+        <div class="booking-layout">
+          <div class="booking-form">
+            <h2 style="font-family:'Playfair Display'; margin-bottom:20px;">Complete Your Booking</h2>
+            <div class="fgrid">
+              <div class="fg"><label>First Name</label><input type="text" id="book-firstname"></div>
+              <div class="fg"><label>Last Name</label><input type="text" id="book-lastname"></div>
+              <div class="fg"><label>Email</label><input type="email" id="book-email"></div>
+              <div class="fg"><label>Phone</label><input type="tel" id="book-phone" placeholder="+20 100 000 0000"></div>
+            </div>
+            <div class="divider"></div>
+            <div class="fgrid">
+              <div class="fg"><label>Check-in</label><input type="date" id="book-checkin"></div>
+              <div class="fg"><label>Check-out</label><input type="date" id="book-checkout"></div>
+              <div class="fg ffull"><label>Special Requests</label><textarea rows="3" id="book-requests" placeholder="Any special requests?"></textarea></div>
+            </div>
+            <button class="btn btn-g" id="confirm-booking" style="width:100%; margin-top:20px; padding:12px;">Confirm Booking</button>
+          </div>
+          <div class="booking-summary">
+            <div class="summary-img"><span id="summary-emoji">🏨</span></div>
+            <div style="font-size:11px; color:var(--gold);" id="summary-type">Room Type</div>
+            <div style="font-size:16px; font-family:'Playfair Display'; margin-bottom:12px;" id="summary-name">Room Name</div>
+            <div class="summary-row"><span>Per Night</span><span id="summary-price">$0</span></div>
+            <div class="summary-row"><span>Nights</span><span id="summary-nights">—</span></div>
+            <div class="summary-row"><span>Subtotal</span><span id="summary-subtotal">$0</span></div>
+            <div class="summary-row"><span>Tax (14%)</span><span id="summary-tax">$0</span></div>
+            <div class="summary-total"><span>Total</span><span id="summary-total">$0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- My Bookings Page -->
+      <div class="subpage" id="page-bookings">
+        <div class="section-header">
+          <h1>My Bookings</h1>
+          <p>Track and manage your reservations</p>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">Reservation History</div>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Reference</th>
+                  <th>Room</th>
+                  <th>Check-in</th>
+                  <th>Check-out</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="bookings-list">
+                <!-- rows will come from backend -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Page -->
+      <div class="subpage" id="page-profile">
+        <div class="profile-layout">
+          <div class="profile-card">
+            <div class="profile-avatar" id="profile-avatar">G</div>
+            <h3 id="profile-name">Guest</h3>
+            <p style="color:var(--text-sub); font-size:12px;" id="profile-email">—</p>
+            <div class="badge b-gold" id="profile-badge" style="margin-top:12px;">🪙 New Member</div>
+            <div style="margin-top:20px; width:100%;">
+              <div style="display:flex; justify-content:space-between; padding:8px 0;"><span>Role</span><span id="profile-role">Guest</span></div>
+              <div style="display:flex; justify-content:space-between; padding:8px 0;"><span>Bookings</span><span id="profile-bookings">0</span></div>
+            </div>
+            <button class="btn btn-r" id="logout-btn" style="margin-top:20px; width:100%;">Sign Out</button>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">Personal Information</div></div>
+            <div class="card-body">
+              <div class="fgrid">
+                <div class="fg"><label>First Name</label><input type="text" id="profile-fn"></div>
+                <div class="fg"><label>Last Name</label><input type="text" id="profile-ln"></div>
+                <div class="fg ffull"><label>Email</label><input type="email" id="profile-em"></div>
+              </div>
+              <button class="btn btn-g" id="save-profile" style="margin-top:16px;">Save Changes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <!-- Rating Modal -->
+  <div id="rating-modal" class="modal">
+    <div class="modal-box">
+      <h3 style="font-family:'Playfair Display'; margin-bottom:10px;">Rate Your Stay</h3>
+      <div class="stars">
+        <span data-rate="1">★</span>
+        <span data-rate="2">★</span>
+        <span data-rate="3">★</span>
+        <span data-rate="4">★</span>
+        <span data-rate="5">★</span>
+      </div>
+      <textarea placeholder="Write your feedback..." rows="4"></textarea>
+      <div class="modal-actions">
+        <button class="btn btn-o" id="close-rate">Cancel</button>
+        <button class="btn btn-g" id="submit-rate">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../public/script.js"></script> <!-- ✅ تم التعديل -->
+  <script>
+
+    // PAGE SWITCH
+    document.querySelectorAll('.tnav').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const pageId = btn.getAttribute('data-page');
+        document.querySelectorAll('.subpage').forEach(p => p.classList.remove('active'));
+        const page = document.getElementById('page-' + pageId);
+        if (page) page.classList.add('active');
+        document.querySelectorAll('.tnav').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    // TOAST
+    window.showToast = function(msg) {
+      let t = document.getElementById('toast');
+      if (!t) {
+        t = document.createElement('div');
+        t.id = 'toast';
+        document.body.appendChild(t);
+      }
+      t.textContent = msg;
+      t.className = 'show';
+      setTimeout(() => t.className = '', 2000);
+    };
+
+    // RATING MODAL
+    document.addEventListener('click', (e) => {
+      if (e.target.dataset.action === 'rate') {
+        document.getElementById('rating-modal').style.display = 'flex';
+      }
+    });
+
+    document.getElementById('close-rate')?.addEventListener('click', () => {
+      document.getElementById('rating-modal').style.display = 'none';
+    });
+
+    document.getElementById('submit-rate')?.addEventListener('click', () => {
+      showToast("Rating submitted successfully!");
+      document.getElementById('rating-modal').style.display = 'none';
+    });
+
+  </script>
+</body>
+</html>

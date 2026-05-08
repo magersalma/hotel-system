@@ -15,5 +15,12 @@ class GuestController {
         // 3. بنرجع الداتا اللي طلعت عشان نبعتها لصفحة الـ HTML
         return $data;
     }
+
+    public function showBookings($guestID) {
+    $model = new GuestModel();
+    return $model->getGuestBookings($guestID); // تأكدي إن الاسم هنا مطابق للموديل
+}
+
+    
 }
 ?>

@@ -1,4 +1,9 @@
 <?php
+<?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+
 // بننادي على الكنترولر عشان يجهزلنا الداتا
 require_once '../controller/GuestController.php';
 
@@ -7,6 +12,11 @@ $controller = new GuestController();
 // هنفترض إن اللي عامل Login هو المستخدم رقم 1 (salma) عشان نجرب
 // بكرة لما تخلصوا الـ Login، الرقم ده هيتغير حسب اللي دخل
 $guestData = $controller->showProfile(1); 
+
+$bookings = $controller->showBookings(1); // بنجيب حجوزات سلمى (رقم 1)
+die("<h1 style='background:white; color:black; padding:20px;'>عدد الحجوزات اللي لاقاها: " . count($bookings) . "</h1>");
+// السطر ده هيطبع اللي راجع من الداتا بيز فوق خالص في الشاشة عشان نشوفه بعنينا
+//echo "<pre>"; var_dump($bookings); echo "</pre>";
 ?>
 
 
@@ -132,8 +142,23 @@ $guestData = $controller->showProfile(1);
         </thead>
 
         <tbody id="bookings-list">
-          <!-- Backend integration point (PHP/Database) -->
-          <!-- rows will come from backend -->
+    <?php if (empty($bookings)): ?>
+        <tr><td colspan="7">No bookings found.</td></tr>
+    <?php else: ?>
+        <?php foreach ($bookings as $row): ?>
+    <tr>
+        <td>#<?php echo $row['res_id']; ?></td>
+        <td><?php echo $row['type']; ?></td>
+        <td><?php echo $row['date']; ?></td>
+        <td> - </td> <td>$<?php echo $row['price']; ?></td>
+        <td><span class="badge b-gold">Confirmed</span></td>
+        <td>
+            <button class="btn btn-o" style="padding: 5px 10px; font-size: 12px;">Rate</button>
+        </td>
+    </tr>
+<?php endforeach; ?>
+    <?php endif; ?>
+
         </tbody>
       </table>
     </div>

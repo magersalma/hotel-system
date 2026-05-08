@@ -1,26 +1,34 @@
 <?php
-// بنعمل import لملف الموديل عشان نعرف نستخدمه
 require_once '../model/GuestModel.php';
 
 class GuestController {
-    
-    // دي الدالة اللي الشاشة هتنادي عليها
+    //function 1
     public function showProfile($id) {
-        // 1. بنعمل Object من الموديل (زي الجافا بالظبط)
         $model = new GuestModel();
         
-        // 2. بننادي الدالة اللي لسه كاتبينها في الخطوة اللي فاتت ونديها رقم النزيل
         $data = $model->getProfileData($id);
         
-        // 3. بنرجع الداتا اللي طلعت عشان نبعتها لصفحة الـ HTML
         return $data;
     }
 
+    //function 2
+    public function updateProfile($id, $fname, $lname, $email) {
+        $model = new GuestModel();
+        
+        $result = $model->updateProfileData($id, $fname, $lname, $email);
+        
+        return $result;
+    }
+    //function 3
     public function showBookings($guestID) {
     $model = new GuestModel();
-    return $model->getGuestBookings($guestID); // تأكدي إن الاسم هنا مطابق للموديل
+    return $model->getGuestBookings($guestID);
 }
 
-    
+    //function 4
+public function submitFeedback($resID, $rating, $comment) {
+    $model = new GuestModel();
+    return $model->addFeedback($resID, $rating, $comment);
+}
 }
 ?>

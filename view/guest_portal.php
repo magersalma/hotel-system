@@ -1,40 +1,45 @@
 <?php
-<?php
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
-
-// بننادي على الكنترولر عشان يجهزلنا الداتا
 require_once '../controller/GuestController.php';
-
 $controller = new GuestController();
 
-// هنفترض إن اللي عامل Login هو المستخدم رقم 1 (salma) عشان نجرب
-// بكرة لما تخلصوا الـ Login، الرقم ده هيتغير حسب اللي دخل
+// --- Handle Profile Update ---
+if (isset($_POST['save_profile'])) {
+    // Get data from the submitted form
+    $fname = $_POST['fname'];
+    $lname = $_POST['lname'];
+    $email = $_POST['email'];
+    
+    // Call the controller to update the data (1 is the default guest ID for demo)
+    $controller->updateProfile(1, $fname, $lname, $email); 
+    
+    // Show success toast notification
+echo "<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        showToast('Profile updated successfully! ✨');
+    });
+</script>";
+}
+
+// Refresh data to update the UI with new changes
 $guestData = $controller->showProfile(1); 
 
-$bookings = $controller->showBookings(1); // بنجيب حجوزات سلمى (رقم 1)
-die("<h1 style='background:white; color:black; padding:20px;'>عدد الحجوزات اللي لاقاها: " . count($bookings) . "</h1>");
-// السطر ده هيطبع اللي راجع من الداتا بيز فوق خالص في الشاشة عشان نشوفه بعنينا
-//echo "<pre>"; var_dump($bookings); echo "</pre>";
+$bookings = $controller->showBookings(1);
 ?>
 
-
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Grand Luxe - Guest Portal</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="../style.css">
 </head>
 <body>
   <div class="ambient"></div>
   <div class="grid-overlay"></div>
 
   <div id="guest-app" style="height:100vh; display:flex; flex-direction:column;">
-    <!-- Topbar -->
     <div class="topbar">
       <div class="topbar-logo">⬡ Grand Luxe</div>
       <div class="topbar-nav">
@@ -44,13 +49,10 @@ die("<h1 style='background:white; color:black; padding:20px;'>عدد الحجو�
       </div>
       <div class="topbar-user" id="user-menu">
         <div class="tav" id="user-avatar">G</div>
-        <span id="user-name">Guest</span>
-      </div>
+<span id="user-name"><?php echo $guestData['fname'] . " " . $guestData['lname']; ?></span> </div>
     </div>
 
-    <!-- Main Content -->
     <div class="app-body">
-      <!-- Rooms Page -->
       <div class="subpage active" id="page-rooms">
         <div class="section-header">
           <h1>Available Rooms</h1>
@@ -80,7 +82,6 @@ die("<h1 style='background:white; color:black; padding:20px;'>عدد الحجو�
         <div class="rooms-grid" id="rooms-container"></div>
       </div>
 
-      <!-- Booking Page -->
       <div class="subpage" id="page-booking">
         <div style="margin-bottom: 20px;">
           <button class="btn btn-o" id="back-to-rooms">← Back to Rooms</button>
@@ -89,9 +90,9 @@ die("<h1 style='background:white; color:black; padding:20px;'>عدد الحجو�
           <div class="booking-form">
             <h2 style="font-family:'Playfair Display'; margin-bottom:20px;">Complete Your Booking</h2>
             <div class="fgrid">
-              <div class="fg"><label>First Name</label><input type="text" id="book-firstname"></div>
-              <div class="fg"><label>Last Name</label><input type="text" id="book-lastname"></div>
-              <div class="fg"><label>Email</label><input type="email" id="book-email"></div>
+              <div class="fg"><label>First Name</label><input type="text" id="book-firstname" value="<?php echo $guestData['fname']; ?>"></div>
+              <div class="fg"><label>Last Name</label><input type="text" id="book-lastname" value="<?php echo $guestData['lname']; ?>"></div>
+              <div class="fg"><label>Email</label><input type="email" id="book-email" value="<?php echo $guestData['email']; ?>"></div>
               <div class="fg"><label>Phone</label><input type="tel" id="book-phone" placeholder="+20 100 000 0000"></div>
             </div>
             <div class="divider"></div>
@@ -115,8 +116,7 @@ die("<h1 style='background:white; color:black; padding:20px;'>عدد الحجو�
         </div>
       </div>
 
-      <!-- My Bookings Page -->
-<div class="subpage" id="page-bookings">
+      <div class="subpage" id="page-bookings">
   <div class="section-header">
     <h1>My Bookings</h1>
     <p>Track and manage your reservations</p>
@@ -137,7 +137,7 @@ die("<h1 style='background:white; color:black; padding:20px;'>عدد الحجو�
             <th>Check-out</th>
             <th>Total</th>
             <th>Status</th>
-            <th>Action</th> <!-- rate -->
+            <th>Action</th>
           </tr>
         </thead>
 
@@ -146,32 +146,30 @@ die("<h1 style='background:white; color:black; padding:20px;'>عدد الحجو�
         <tr><td colspan="7">No bookings found.</td></tr>
     <?php else: ?>
         <?php foreach ($bookings as $row): ?>
-    <tr>
-        <td>#<?php echo $row['res_id']; ?></td>
-        <td><?php echo $row['type']; ?></td>
-        <td><?php echo $row['date']; ?></td>
-        <td> - </td> <td>$<?php echo $row['price']; ?></td>
-        <td><span class="badge b-gold">Confirmed</span></td>
-        <td>
-            <button class="btn btn-o" style="padding: 5px 10px; font-size: 12px;">Rate</button>
-        </td>
-    </tr>
-<?php endforeach; ?>
+        <tr>
+            <td>#<?php echo $row['res_id']; ?></td>
+            <td><?php echo $row['type']; ?></td>
+            <td><?php echo $row['date']; ?></td>
+            <td> - </td>
+            <td>$<?php echo $row['price']; ?></td>
+            <td><span class="badge b-gold">Confirmed</span></td>
+<td>
+    <button class="btn btn-o btn-rate" data-res-id="<?php echo $row['res_id']; ?>" onclick="openRatingModal(this)">Rate</button>
+</td>
+        </tr>
+        <?php endforeach; ?>
     <?php endif; ?>
-
-        </tbody>
+</tbody>
       </table>
     </div>
   </div>
 </div>
 
-      <!-- Profile Page -->
       <div class="subpage" id="page-profile">
         <div class="profile-layout">
           <div class="profile-card">
             <div class="profile-avatar" id="profile-avatar">G</div>
-            <h3 id="profile-name">Guest</h3>
-            <p style="color:var(--text-sub); font-size:12px;" id="profile-email">—</p>
+<h3 id="profile-name"><?php echo $guestData['fname'] . " " . $guestData['lname']; ?></h3>            <p style="color:var(--text-sub); font-size:12px;" id="profile-email">—</p>
             <div class="badge b-gold" id="profile-badge" style="margin-top:12px;">🪙 New Member</div>
             <div style="margin-top:20px; width:100%;">
               <div style="display:flex; justify-content:space-between; padding:8px 0;"><span>Role</span><span id="profile-role">Guest</span></div>
@@ -182,13 +180,23 @@ die("<h1 style='background:white; color:black; padding:20px;'>عدد الحجو�
           <div class="card">
             <div class="card-head"><div class="card-title">Personal Information</div></div>
             <div class="card-body">
-              <div class="fgrid">
-                <div class="fg"><label>First Name</label><input type="text" id="profile-fn"></div>
-                <div class="fg"><label>Last Name</label><input type="text" id="profile-ln"></div>
-                <div class="fg ffull"><label>Email</label><input type="email" id="profile-em"></div>
-              </div>
-              <button class="btn btn-g" id="save-profile" style="margin-top:16px;">Save Changes</button>
-            </div>
+              <form method="POST" action="guest_portal.php">
+    <div class="fgrid">
+        <div class="fg">
+            <label>First Name</label>
+            <input type="text" name="fname" id="profile-fn" value="<?php echo $guestData['fname']; ?>">
+        </div>
+        <div class="fg">
+            <label>Last Name</label>
+            <input type="text" name="lname" id="profile-ln" value="<?php echo $guestData['lname']; ?>">
+        </div>
+        <div class="fg ffull">
+            <label>Email</label>
+            <input type="email" name="email" id="profile-em" value="<?php echo $guestData['email']; ?>">
+        </div>
+        <button type="submit" name="save_profile" class="btn btn-g" style="margin-top:16px;">Save Changes</button>
+    </div>
+</form>
           </div>
         </div>
       </div>
@@ -196,14 +204,14 @@ die("<h1 style='background:white; color:black; padding:20px;'>عدد الحجو�
   </div>
 
   <div id="toast"></div>
-  <!-- Rating Modal -->
-<div id="rating-modal" class="modal">
+  
+  <div id="rating-modal" class="modal">
   <div class="modal-box">
 
     <h3 style="font-family:'Playfair Display'; margin-bottom:10px;">
       Rate Your Stay
     </h3>
-
+<input type="hidden" id="modal-res-id">
     <div class="stars">
       <span data-rate="1">★</span>
       <span data-rate="2">★</span>
@@ -221,7 +229,7 @@ die("<h1 style='background:white; color:black; padding:20px;'>عدد الحجو�
 
   </div>
 </div>
-  <script src="script.js"></script>
+<script src="../script.js"></script>
   <script>
     
 // PAGE SWITCH ONLY
@@ -256,25 +264,60 @@ window.showToast = function(msg) {
   t.className = 'show';
   setTimeout(() => t.className = '', 2000);
 };
-// ===== RATING MODAL UI ONLY =====
 
-// open modal
-document.addEventListener('click', (e) => {
-  if (e.target.dataset.action === 'rate') {
+// ===== RATING MODAL UI =====
+
+function openRatingModal(btn) {
+    const resId = btn.getAttribute('data-res-id');
+    document.getElementById('modal-res-id').value = resId;
     document.getElementById('rating-modal').style.display = 'flex';
-  }
-});
+}
 
-// close modal
 document.getElementById('close-rate')?.addEventListener('click', () => {
-  document.getElementById('rating-modal').style.display = 'none';
+    document.getElementById('rating-modal').style.display = 'none';
 });
 
-// submit rating (backend ready)
-document.getElementById('submit-rate')?.addEventListener('click', () => {
-  // Backend integration point (PHP / DB)
-  showToast("Rating submitted successfully!");
-  document.getElementById('rating-modal').style.display = 'none';
+document.querySelectorAll('.stars span').forEach(star => {
+    star.onclick = function() {
+        document.querySelectorAll('.stars span').forEach(s => {
+            s.classList.remove('active');
+            s.style.color = "#444"; 
+        });
+        
+        this.classList.add('active');
+        let current = this;
+        while(current) {
+            current.style.color = "#d4af37"; 
+            current = current.previousElementSibling;
+        }
+    };
+});
+
+// 4. Submit Feedback to Server
+document.getElementById('submit-rate')?.addEventListener('click', (e) => {
+    e.preventDefault();  
+    
+    const resId = document.getElementById('modal-res-id').value;
+    const rating = document.querySelector('.stars span.active')?.dataset.rate || 5;
+    const feedback = document.querySelector('#rating-modal textarea').value;
+
+    if(!feedback) {
+        showToast("Please write your feedback first! ✍️");
+        return;
+    }
+
+    fetch('save_feedback.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `res_id=${resId}&rating=${rating}&comment=${feedback}`
+    })
+    .then(() => {
+        showToast("Thank you for your feedback! ⭐");
+        
+        document.getElementById('rating-modal').style.display = 'none';
+        
+        document.querySelector('#rating-modal textarea').value = '';
+    });
 });
   </script>
 </body>

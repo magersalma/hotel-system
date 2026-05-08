@@ -3,11 +3,11 @@ class Database {
     private static $instance = null;
     private $connection;
     
-    // بيانات الداتا بيز اللي شفناها في الـ phpMyAdmin
+    
     private $host = 'localhost';
     private $user = 'root';
     private $pass = '';
-    private $dbname = 'hotel'; // الاسم اللي ظهر عندك في الصور
+    private $dbname = 'hotel (2)'; 
 
     private function __construct() {
         $this->connection = new mysqli($this->host, $this->user, $this->pass, $this->dbname);

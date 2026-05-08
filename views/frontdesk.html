@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grand Luxe - Front Desk Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'DM Sans',sans-serif;background:#0f0f14;color:#fff}
+.topbar{height:64px;background:#151520;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid #252533}
+.topbar-logo{color:#c9a84c;font-weight:600}
+.topbar-nav{display:flex;gap:10px}
+.tnav{padding:8px 12px;border-radius:8px;color:#aaa;cursor:pointer}
+.tnav.active,.tnav:hover{background:#222;color:#fff}
+.app-body{padding:24px}
+.section{display:none}
+.section.active{display:block}
+.card{background:#1b1b24;border-radius:12px;padding:18px;margin-bottom:18px}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.kpi-card{background:#1b1b24;border-radius:12px;padding:18px}
+.kpi-value{font-size:26px;font-weight:600}
+.table-wrapper{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th,td{padding:12px;text-align:left;border-bottom:1px solid #2a2a36}
+th{color:#c9a84c;font-size:13px}
+.badge{padding:4px 10px;border-radius:20px;font-size:12px}
+.gold{background:#c9a84c;color:#000}.green{background:#4caf50;color:#000}.red{background:#e05a5a}
+.action-btn{background:#c9a84c;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;margin-right:6px}
+.action-btn.reject{background:#e05a5a;color:#fff}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-logo">Grand Luxe — Front Desk</div>
+  <div class="topbar-nav">
+    <div class="tnav active" data-target="dashboard">Dashboard</div>
+    <div class="tnav" data-target="reservations">Reservations</div>
+    <div class="tnav" data-target="rooms">Rooms</div>
+    <div class="tnav" data-target="guests">Guests</div>
+    <div class="tnav" data-target="payments">Payments</div>
+  </div>
+</div>
+
+<div class="app-body">
+  <div id="dashboard" class="section active">
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-value">5</div><div>Pending Reservations</div></div>
+      <div class="kpi-card"><div class="kpi-value">8</div><div>Check-ins Today</div></div>
+      <div class="kpi-card"><div class="kpi-value">12</div><div>Available Rooms</div></div>
+      <div class="kpi-card"><div class="kpi-value">4</div><div>Check-outs Today</div></div>
+    </div>
+  </div>
+
+  <div id="reservations" class="section">
+    <div class="card">
+      <h3>Latest Reservations</h3>
+      <table>
+        <thead><tr><th>Room</th><th>Guest</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>101</td>
+            <td>Ahmed Ali</td>
+            <td><span class="badge gold" id="status-101">Pending</span></td>
+            <td>
+              <button class="action-btn" onclick="approveBooking('101')">Approve</button>
+              <button class="action-btn reject" onclick="rejectBooking('101')">Reject</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="rooms" class="section">
+    <div class="card">
+      <h3>Rooms</h3>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Room</th><th>Type</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="rooms-list">
+            <tr>
+              <td>101</td>
+              <td>Deluxe</td>
+              <td><span class="badge green" id="room-status-101">Available</span></td>
+              <td><button class="action-btn" onclick="toggleRoomStatus('101')">Change</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="guests" class="section">
+    <div class="card">
+      <h3>Registered Guests</h3>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr><th>Name</th><th>Email</th><th>Role</th><th>Bookings</th><th>Status</th><th>Action</th></tr>
+          </thead>
+          <tbody id="guests-list"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="payments" class="section">
+    <div class="card">
+      <h3>Payments</h3>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Invoice</th><th>Guest</th><th>Amount</th><th>Status</th></tr></thead>
+          <tbody id="payments-list"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.tnav').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tnav').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.target).classList.add('active');
+  });
+});
+function approveBooking(id){
+  const badge=document.getElementById('status-'+id);
+  if(!badge) return;
+  badge.textContent='Approved';
+  badge.className='badge green';
+}
+function rejectBooking(id){
+  const badge=document.getElementById('status-'+id);
+  if(!badge) return;
+  badge.textContent='Rejected';
+  badge.className='badge red';
+}
+
+function toggleRoomStatus(id){
+  const badge=document.getElementById('room-status-'+id);
+  if(!badge) return;
+
+  if(badge.textContent === 'Available'){
+    badge.textContent = 'Occupied';
+    badge.className = 'badge red';
+  }else if(badge.textContent === 'Occupied'){
+    badge.textContent = 'Maintenance';
+    badge.className = 'badge gold';
+  }else{
+    badge.textContent = 'Available';
+    badge.className = 'badge green';
+  }
+}
+</script>
+</body>
+</html>

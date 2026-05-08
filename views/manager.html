@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grand Luxe - Manager Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../public/style.css">  
+</head>
+<body>
+  <div class="ambient"></div>
+  <div class="grid-overlay"></div>
+
+  <div id="manager-app" style="height:100vh; display:flex; flex-direction:column;">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-logo">⬡ Grand Luxe <span style="font-size:11px; color:var(--text-muted);">Manager Portal</span></div>
+      <div class="topbar-nav">
+        <div class="tnav active" data-page="dashboard">▦ Dashboard</div>
+        <div class="tnav" data-page="bookings">📋 Bookings</div>
+        <div class="tnav" data-page="guests">👥 Guests</div>
+        <div class="tnav" data-page="blacklist">🚫 Blacklist</div>
+        <div class="tnav" data-page="rooms">🛏 Rooms</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:16px;">
+        <span id="manager-name" style="font-size:13px;">Manager</span>
+        <button class="btn btn-danger btn-sm" id="logout-btn">Sign Out</button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="app-body">
+      <!-- Dashboard Page -->
+      <div class="subpage active" id="page-dashboard">
+        <div class="section-header">
+          <h1>Dashboard</h1>
+          <p>Real-time hotel performance</p>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-icon">📋</div><div class="kpi-value" id="kpi-total">0</div><div class="kpi-label">Total Bookings</div></div>
+          <div class="kpi-card"><div class="kpi-icon">⏳</div><div class="kpi-value" id="kpi-pending">0</div><div class="kpi-label">Pending Approval</div></div>
+          <div class="kpi-card"><div class="kpi-icon">✅</div><div class="kpi-value" id="kpi-confirmed">0</div><div class="kpi-label">Confirmed</div></div>
+          <div class="kpi-card"><div class="kpi-icon">🚫</div><div class="kpi-value" id="kpi-blacklist">0</div><div class="kpi-label">Blacklisted</div></div>
+        </div>
+        <div class="two-columns">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Pending Approvals</div><button class="btn btn-warning btn-sm" id="view-all-bookings">View All</button></div>
+            <div class="table-wrapper"><table><thead><tr><th>Guest</th><th>Room</th><th>Dates</th><th>Action</th></tr></thead><tbody id="pending-list"></tbody></table></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Recent Guests</div></div>
+            <div class="guest-list" id="guest-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bookings Page -->
+      <div class="subpage" id="page-bookings">
+        <div class="section-header"><h1>Bookings Management</h1><p>Review, approve, or cancel reservations</p></div>
+        <div class="filter-bar">
+          <div class="filter-group"><label>Status</label><select id="booking-filter"><option value="">All</option><option value="pending">Pending</option><option value="confirmed">Confirmed</option><option value="cancelled">Cancelled</option></select></div>
+          <div class="filter-group"><label>Search</label><input type="text" id="booking-search" placeholder="Guest name or ref..."></div>
+          <button class="btn btn-warning btn-sm" id="search-bookings">Search</button>
+        </div>
+        <div class="card"><div class="table-wrapper"><table><thead><tr><th>Ref</th><th>Guest</th><th>Room</th><th>Check-in</th><th>Check-out</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead><tbody id="all-bookings-list"></tbody></table></div></div>
+      </div>
+
+      <!-- Guests Page -->
+      <div class="subpage" id="page-guests">
+        <div class="section-header"><h1>Registered Guests</h1><p>All guest accounts and their details</p></div>
+        <div class="card"><div class="table-wrapper"><table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Bookings</th><th>Status</th><th>Action</th></tr></thead><tbody id="guests-list"></tbody></table></div></div>
+      </div>
+
+      <!-- Blacklist Page -->
+      <div class="subpage" id="page-blacklist">
+        <div class="section-header"><h1>Blacklist Management</h1><p>Block guests from making bookings</p></div>
+        <div class="two-columns">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Add to Blacklist</div></div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="form-field full-width"><label>Guest Name or Email</label><input type="text" id="blacklist-name" placeholder="Enter name or email"></div>
+                <div class="form-field full-width"><label>Reason</label><textarea id="blacklist-reason" rows="3" placeholder="Reason for blacklisting..."></textarea></div>
+              </div>
+              <button class="btn btn-danger" id="add-blacklist-btn" style="margin-top:16px;">🚫 Add to Blacklist</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Blacklisted Guests <span id="blacklist-count" style="font-size:12px; color:var(--text-muted);">0 entries</span></div></div>
+            <div id="blacklist-list" style="padding:0 20px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rooms Page -->
+      <div class="subpage" id="page-rooms">
+        <div class="section-header"><h1>Rooms Management</h1><p>Manage room availability and pricing</p></div>
+        <div class="card"><div class="table-wrapper"><table><thead><tr><th>Room</th><th>Type</th><th>Price</th><th>Capacity</th><th>Status</th><th>Action</th></tr></thead><tbody id="rooms-list"></tbody></table></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script src="script.js"></script>
+  <script>
+   
+// ==========================
+// PAGE NAVIGATION (CORE)
+// ==========================
+document.querySelectorAll('.tnav').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const pageId = btn.getAttribute('data-page');
+
+    // switch pages
+    document.querySelectorAll('.subpage')
+      .forEach(p => p.classList.remove('active'));
+
+    const target = document.getElementById('page-' + pageId);
+    if (target) target.classList.add('active');
+
+    // active tab
+    document.querySelectorAll('.tnav')
+      .forEach(t => t.classList.remove('active'));
+
+    btn.classList.add('active');
+  });
+});
+
+
+// ==========================
+// SIMPLE TOAST (UI ONLY)
+// ==========================
+window.showToast = function(message) {
+  let toast = document.getElementById('toast');
+
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'toast';
+    document.body.appendChild(toast);
+  }
+
+  toast.textContent = message;
+  toast.className = 'show';
+
+  setTimeout(() => {
+    toast.className = '';
+  }, 2000);
+};
+
+
+// ==========================
+// PLACEHOLDER ACTIONS (NO BACKEND)
+// ==========================
+
+// Rooms page button
+window.bookRoom = function() {
+  showToast("Backend integration needed (PHP)");
+};
+
+// Booking buttons
+window.createBooking = function() {
+  showToast("Create booking (PHP backend required)");
+};
+
+window.updateBooking = function() {
+  showToast("Update booking (PHP backend required)");
+};
+
+window.cancelBooking = function() {
+  showToast("Cancel booking (PHP backend required)");
+};
+
+// Guest actions
+window.viewGuest = function() {
+  showToast("View guest (PHP backend required)");
+};
+
+window.editGuest = function() {
+  showToast("Edit guest (PHP backend required)");
+};
+
+window.deleteGuest = function() {
+  showToast("Delete guest (PHP backend required)");
+};
+
+
+// ==========================
+// FORM HANDLING (NO DATA)
+// ==========================
+document.querySelectorAll('form').forEach(form => {
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    showToast("Form submitted → connect PHP backend");
+  });
+});
+
+  </script>
+</body>
+</html>

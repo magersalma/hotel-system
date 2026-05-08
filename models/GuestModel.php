@@ -1,40 +1,66 @@
 <?php
-require_once '../config/db.php';
-
+require_once '../db.php';
 class GuestModel {
+    private $db;  
 
-    public static function getByEmail($email) {
-        $conn = Database::getConnection();
-        $stmt = $conn->prepare("SELECT * FROM guest WHERE email = ?");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        return $stmt->get_result()->fetch_assoc();
+    public function __construct() {
+        $this->db = Database::getInstance()->getConnection();
     }
 
-    public static function getById($id) {
-        $conn = Database::getConnection();
-        $stmt = $conn->prepare("SELECT * FROM guest WHERE guest_num = ?");
-        $stmt->bind_param("i", $id);
+    //function 1 : view profile
+    public function getProfileData($guestId) {
+         $sql = "SELECT * FROM guest WHERE guest_num = ?";
+        
+        $stmt = $this->db->prepare($sql);
+        
+        $stmt->bind_param("i", $guestId);
+        
         $stmt->execute();
-        return $stmt->get_result()->fetch_assoc();
+        
+        $result = $stmt->get_result();
+        
+        return $result->fetch_assoc();
     }
-
-    public static function create($fname, $lname, $email, $password) {
-        $conn = Database::getConnection();
-        $check = $conn->prepare("SELECT guest_num FROM guest WHERE email = ?");
-        $check->bind_param("s", $email);
-        $check->execute();
-        $check->store_result();
-        if ($check->num_rows > 0) {
-            return "email_exists";
-        }
-        $stmt = $conn->prepare("INSERT INTO guest (fname, lname, email, password) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssss", $fname, $lname, $email, $password);
+    
+    //function 2:update profile
+    public function updateProfileData($guestId, $fname, $lname, $email) {
+        $sql = "UPDATE guest SET fname = ?, lname = ?, email = ? WHERE guest_num = ?";
+        
+        $stmt = $this->db->prepare($sql);
+        
+        $stmt->bind_param("sssi", $fname, $lname, $email, $guestId);
+        
         if ($stmt->execute()) {
-            return "success";
+            return true;  
         } else {
-            return "error";
+            return false;  
         }
     }
+    //function 3:booking
+    public function getGuestBookings($guestID) {
+    $sql = "SELECT r.*, rm.type, rm.price 
+            FROM reservation r 
+            JOIN include_room ir ON r.res_id = ir.res_id
+            JOIN room rm ON ir.room_num = rm.room_num 
+            WHERE r.guest_num = ?";
+    
+    $stmt = $this->db->prepare($sql);
+    $stmt->bind_param("i", $guestID);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    $bookings = [];
+    while ($row = $result->fetch_assoc()) {
+        $bookings[] = $row;
+    }
+    return $bookings;
+}
+    //function 4:feedback
+public function addFeedback($resID, $rating, $comment) {
+    $sql = "INSERT INTO feedback (res_id, rating, comment) VALUES (?, ?, ?)";
+    $stmt = $this->db->prepare($sql);
+    $stmt->bind_param("iis", $resID, $rating, $comment);
+    return $stmt->execute();
+}
 }
 ?>
